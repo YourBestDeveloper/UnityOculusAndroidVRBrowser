@@ -39,7 +39,15 @@ import org.mozilla.geckoview.WebRequestError;
 
 import java.util.HashMap;
 
-public class GeckoViewPLugin extends Fragment implements GeckoSession.NavigationDelegate, GeckoSession.ContentDelegate, GeckoSession.HistoryDelegate, GeckoSession.TextInputDelegate, GeckoSession.ProgressDelegate, GeckoRuntime.Delegate {
+public class GeckoViewPLugin
+        extends Fragment
+        implements GeckoSession.NavigationDelegate,
+            GeckoSession.ContentDelegate,
+            GeckoSession.HistoryDelegate,
+            GeckoSession.TextInputDelegate,
+            GeckoSession.ProgressDelegate,
+            GeckoSession.PermissionDelegate,
+            GeckoRuntime.Delegate {
     static String FRAGMENT_TAG = "AndroidUnityMainGL";
     static int Width;
     static int Height;
@@ -503,7 +511,8 @@ public class GeckoViewPLugin extends Fragment implements GeckoSession.Navigation
         session.setContentDelegate(this);
         session.setHistoryDelegate(this);
         session.getTextInput().setDelegate(this);
-        session.setProgressDelegate( this);
+        session.setProgressDelegate(this);
+        session.setPermissionDelegate(this);
         return session;
 
     }
@@ -911,6 +920,41 @@ public class GeckoViewPLugin extends Fragment implements GeckoSession.Navigation
         }
     }
 
+
+
+    /**
+     * ***********************
+     * PERMISSION DELEGATE
+     * ***********************
+     * */
+
+    @Override
+    public void onAndroidPermissionsRequest(final GeckoSession session,
+                                            final String[] permissions,
+                                            final Callback callback) {
+        Log.d(LOG_TAG, "onAndroidPermissionsRequest");
+        callback.grant();
+    }
+
+    @Override
+    public void onMediaPermissionRequest(@NonNull GeckoSession session, @NonNull String uri, @Nullable MediaSource[] video, @Nullable MediaSource[] audio, @NonNull MediaCallback callback) {
+        Log.d(LOG_TAG, "onMediaPermissionRequest");
+
+        int idxMicrophone = -1;
+        for (int i = 0; i < audio.length; i++) {
+            if (audio[i].source == MediaSource.SOURCE_MICROPHONE) {
+                Log.d(LOG_TAG, "onMediaPermissionRequest - microphone found");
+                idxMicrophone = i;
+                break;
+            }
+        }
+
+        if (idxMicrophone >= 0) {
+            callback.grant(null, audio[idxMicrophone]);
+        } else {
+            callback.reject();
+        }
+    }
 
     /*
      ********************************

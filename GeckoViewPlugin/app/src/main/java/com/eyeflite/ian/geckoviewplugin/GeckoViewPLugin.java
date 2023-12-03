@@ -218,8 +218,9 @@ public class GeckoViewPLugin
     public void AddKeyCode(int code, int metaState){
         final Activity a = UnityPlayer.currentActivity;
         a.runOnUiThread(() -> {
+            MakeWebviewGetFocus();
+
 //            int keyCode = KeyEvent.KEYCODE_HOME
-//            MakeWebviewGetFocus();
 //            Log.d(LOG_TAG, "keycode is: " + code);
             KeyEvent event = new KeyEvent(SystemClock.uptimeMillis(),
                     SystemClock.uptimeMillis(),
@@ -954,6 +955,11 @@ public class GeckoViewPLugin
         } else {
             callback.reject();
         }
+    }
+
+    @Override
+    public void onContentPermissionRequest(@androidx.annotation.NonNull GeckoSession session, @androidx.annotation.Nullable String uri, int type, @androidx.annotation.NonNull Callback callback) {
+        callback.grant();
     }
 
     /*
